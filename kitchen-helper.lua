@@ -115,7 +115,7 @@ end
 function isSRP()
   local serverName = sampGetCurrentServerName();
 
-  return serverName:find('Samp%-Rp%.Ru') ~= nil;
+  return serverName:find('Samp%-Rp%.Ru') ~= nil or serverName:find('SRP') ~= nil;
 end
 
 function showConfigDialog()
@@ -140,3 +140,17 @@ end
 function saveConfig(data)
   inicfg.save(data, CONFIG_FILE_NAME);
 end
+
+-->> SCRIPT UTF-8
+-->> utf8(table path, incoming variables encoding, outcoming variables encoding)
+-->> table path example { 'sampev', 'onShowDialog' }
+-->> encoding options nil | AnsiToUtf8 | Utf8ToAnsi
+_utf8 = load([=[return function(utf8_func, in_encoding, out_encoding); if encoding == nil then; encoding = require("encoding"); encoding.default = "CP1251"; u8 = encoding.UTF8; end; if type(utf8_func) ~= "table" then; return false; end; if AnsiToUtf8 == nil or Utf8ToAnsi == nil then; AnsiToUtf8 = function(text); return u8(text); end; Utf8ToAnsi = function(text); return u8:decode(text); end; end; if _UTF8_FUNCTION_SAVE == nil then; _UTF8_FUNCTION_SAVE = {}; end; local change_var = "_G"; for s = 1, #utf8_func do; change_var = string.format('%s["%s"]', change_var, utf8_func[s]); end; if _UTF8_FUNCTION_SAVE[change_var] == nil then; _UTF8_FUNCTION = function(...); local pack = table.pack(...); readTable = function(t, enc); for k, v in next, t do; if type(v) == 'table' then; readTable(v, enc); else; if enc ~= nil and (enc == "AnsiToUtf8" or enc == "Utf8ToAnsi") then; if type(k) == "string" then; k = _G[enc](k); end; if type(v) == "string" then; t[k] = _G[enc](v); end; end; end; end; return t; end; return table.unpack(readTable({_UTF8_FUNCTION_SAVE[change_var](table.unpack(readTable(pack, in_encoding)))}, out_encoding)); end; local text = string.format("_UTF8_FUNCTION_SAVE['%s'] = %s; %s = _UTF8_FUNCTION;", change_var, change_var, change_var); load(text)(); _UTF8_FUNCTION = nil; end; return true; end]=])
+function utf8(...)
+  pcall(_utf8(), ...);
+end
+
+utf8({ 'sampShowDialog' }, 'Utf8ToAnsi');
+utf8({ 'hook', 'onServerMessage' }, 'AnsiToUtf8', 'Utf8ToAnsi');
+utf8({ 'hook', 'onShowDialog' }, 'AnsiToUtf8', 'Utf8ToAnsi');
+utf8({ 'hook', 'onShowDialog' }, 'AnsiToUtf8', 'Utf8ToAnsi');
