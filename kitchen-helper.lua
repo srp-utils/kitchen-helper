@@ -61,24 +61,26 @@ function main()
 end
 
 function hook.onShowDialog(id, style, title, button, button2, text)
-  if isSRP() and string.equals(title, 'Кухня') then
-    if state.config.autoRent and string.find(text, 'Аренда кухни') and string.equals(button, 'Заплатить') then
+  if isSRP() and title:equals('Кухня') then
+    if state.config.autoRent and text:find('Аренда кухни') and button:equals('Заплатить') then
       sampSendDialogResponse(id, 1);
 
       return false;
     end
 
-    if state.config.autoCook and style == DIALOG_STYLE_TABLIST_HEADERS and string.find(text, 'Блюдо') and string.equals(button, 'Ок') then
+    if state.config.autoCook and style == DIALOG_STYLE_TABLIST_HEADERS and text:find('Блюдо') and button:equals('Ок') then
       dishesDialogId = id;
 
       if autoCookItemId then
-        sampSendDialogResponse(id, 1, autoCookItemId);
+      
+
+        sampSendDialogResponse(id, 1);
 
         return false;
       end
     end
 
-    if style == DIALOG_STYLE_MSGBOX and string.equals(button, 'Начать') then
+    if style == DIALOG_STYLE_MSGBOX and button:equals('Начать') then
       sampSendDialogResponse(id, 1);
 
       return false;
@@ -95,18 +97,18 @@ end
 function hook.onServerMessage(color, text)
   if isSRP() then
     if state.config.autoCook then
-      if color == -10270721 and (string.equals(text, ' У вас нет нужных ингредиентов') or string.equals(text, ' Нет места')) then
+      if color == -10270721 and (text:equals(' У вас нет нужных ингредиентов') or text:equals(' Нет места')) then
         autoCookItemId = nil;
       end
     end
 
-    if color == 1790050303 and string.match('Вы приготовили.*: %d+/%d+') then
+    if color == 1790050303 and text:match('Вы приготовили.*: %d+/%d+') then
       state.stats.cookCount = state.stats.cookCount + 1;
 
       saveConfig(state);
     end
 
-    if color == 1790050303 and string.find('Вы арендовали кухню на') then
+    if color == 1790050303 and text:find('Вы арендовали кухню на') then
       state.stats.rentCount = state.stats.rentCount + 1;
 
       saveConfig(state);
@@ -145,18 +147,18 @@ function saveConfig(data)
   inicfg.save(data, CONFIG_FILE_NAME);
 end
 
-
+ 
 local find = string.find;
 local match = string.match;
 
-function string.find(s, pattern)
-  return find(s, u8:decode(pattern));
+function string.find(self, pattern)
+  return find(self, u8:decode(pattern), init, plain);
 end
 
-function string.match(s, pattern)
-  return match(s, u8:decode(pattern));
+function string.match(self, pattern)
+  return match(self, u8:decode(pattern));
 end
 
-function string.equals(s, s2)
-  return s == u8:decode(s2);
+function string.equals(self, s2)
+  return self == u8:decode(s2);
 end
