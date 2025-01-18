@@ -5,6 +5,10 @@ script_author('https://samp-rp.online/members/1017623/');
 
 local hook = require 'samp.events';
 local inicfg = require 'inicfg';
+local encoding = require 'encoding';
+local u8 = encoding.UTF8;
+
+encoding.default = 'cp1251';
 
 local CONFIG_DIALOG_ID = 2003;
 local CONFIG_FILE_NAME = 'srp-kitchen-helper.ini';
@@ -57,29 +61,29 @@ function main()
 end
 
 function hook.onShowDialog(id, style, title, button, button2, text)
-    if isSRP() and title == 'Кухня' then
-      if state.config.autoRent and text:find('Аренда кухни') and button == 'Заплатить' then
-        sampSendDialogResponse(id, 1);
+  if isSRP() and string.equals(title, 'Кухня') then
+    if state.config.autoRent and string.find(text, 'Аренда кухни') and string.equals(button, 'Заплатить') then
+      sampSendDialogResponse(id, 1);
 
-        return false;
-      end
+      return false;
+    end
 
-      if state.config.autoCook and style == DIALOG_STYLE_TABLIST_HEADERS and text:find('Блюдо') and button == 'Ок' then
-        dishesDialogId = id;
+    if state.config.autoCook and style == DIALOG_STYLE_TABLIST_HEADERS and string.find(text, 'Блюдо') and string.equals(button, 'Ок') then
+      dishesDialogId = id;
 
-        if autoCookItemId then
-          sampSendDialogResponse(id, 1, autoCookItemId);
-
-          return false;
-        end
-      end
-
-      if style == DIALOG_STYLE_MSGBOX and button == 'Начать' then
-        sampSendDialogResponse(id, 1);
+      if autoCookItemId then
+        sampSendDialogResponse(id, 1, autoCookItemId);
 
         return false;
       end
     end
+
+    if style == DIALOG_STYLE_MSGBOX and string.equals(button, 'Начать') then
+      sampSendDialogResponse(id, 1);
+
+      return false;
+    end
+  end
 end
 
 function hook.onSendDialogResponse(id, button, listboxId, input)
@@ -91,18 +95,18 @@ end
 function hook.onServerMessage(color, text)
   if isSRP() then
     if state.config.autoCook then
-      if color == -10270721 and (text == ' У вас нет нужных ингредиентов' or text == ' Нет места') then
+      if color == -10270721 and (string.equals(text, ' У вас нет нужных ингредиентов') or string.equals(text, ' Нет места')) then
         autoCookItemId = nil;
       end
     end
 
-    if color == 1790050303 and text:match('Вы приготовили.*: %d+/%d+') then
+    if color == 1790050303 and string.match('Вы приготовили.*: %d+/%d+') then
       state.stats.cookCount = state.stats.cookCount + 1;
 
       saveConfig(state);
     end
 
-    if color == 1790050303 and text:find('Вы арендовали кухню на') then
+    if color == 1790050303 and string.find('Вы арендовали кухню на') then
       state.stats.rentCount = state.stats.rentCount + 1;
 
       saveConfig(state);
@@ -115,7 +119,7 @@ end
 function isSRP()
   local serverName = sampGetCurrentServerName();
 
-  return serverName:find('Samp%-Rp%.Ru') ~= nil or serverName:find('SRP') ~= nil;
+  return serverName:find('Samp%-Rp.Ru') ~= nil or serverName:find('SRP') ~= nil;
 end
 
 function showConfigDialog()
@@ -134,23 +138,25 @@ function showConfigDialog()
     'Плит арендовано\t' .. state.stats.rentCount .. '\n \n' ..
     'Сбросить статистику';
 
-  sampShowDialog(CONFIG_DIALOG_ID, 'KitchenHelper', body, 'Выбрать', 'Закрыть', DIALOG_STYLE_TABLIST);
+  sampShowDialog(CONFIG_DIALOG_ID, 'KitchenHelper', u8:decode(body), u8:decode('Выбрать'), u8:decode('Закрыть'), DIALOG_STYLE_TABLIST);
 end
 
 function saveConfig(data)
   inicfg.save(data, CONFIG_FILE_NAME);
 end
 
--->> SCRIPT UTF-8
--->> utf8(table path, incoming variables encoding, outcoming variables encoding)
--->> table path example { 'sampev', 'onShowDialog' }
--->> encoding options nil | AnsiToUtf8 | Utf8ToAnsi
-_utf8 = load([=[return function(utf8_func, in_encoding, out_encoding); if encoding == nil then; encoding = require("encoding"); encoding.default = "CP1251"; u8 = encoding.UTF8; end; if type(utf8_func) ~= "table" then; return false; end; if AnsiToUtf8 == nil or Utf8ToAnsi == nil then; AnsiToUtf8 = function(text); return u8(text); end; Utf8ToAnsi = function(text); return u8:decode(text); end; end; if _UTF8_FUNCTION_SAVE == nil then; _UTF8_FUNCTION_SAVE = {}; end; local change_var = "_G"; for s = 1, #utf8_func do; change_var = string.format('%s["%s"]', change_var, utf8_func[s]); end; if _UTF8_FUNCTION_SAVE[change_var] == nil then; _UTF8_FUNCTION = function(...); local pack = table.pack(...); readTable = function(t, enc); for k, v in next, t do; if type(v) == 'table' then; readTable(v, enc); else; if enc ~= nil and (enc == "AnsiToUtf8" or enc == "Utf8ToAnsi") then; if type(k) == "string" then; k = _G[enc](k); end; if type(v) == "string" then; t[k] = _G[enc](v); end; end; end; end; return t; end; return table.unpack(readTable({_UTF8_FUNCTION_SAVE[change_var](table.unpack(readTable(pack, in_encoding)))}, out_encoding)); end; local text = string.format("_UTF8_FUNCTION_SAVE['%s'] = %s; %s = _UTF8_FUNCTION;", change_var, change_var, change_var); load(text)(); _UTF8_FUNCTION = nil; end; return true; end]=])
-function utf8(...)
-  pcall(_utf8(), ...);
+
+local find = string.find;
+local match = string.match;
+
+function string.find(s, pattern)
+  return find(s, u8:decode(pattern));
 end
 
-utf8({ 'sampShowDialog' }, 'Utf8ToAnsi');
-utf8({ 'hook', 'onServerMessage' }, 'AnsiToUtf8', 'Utf8ToAnsi');
-utf8({ 'hook', 'onShowDialog' }, 'AnsiToUtf8', 'Utf8ToAnsi');
-utf8({ 'hook', 'onShowDialog' }, 'AnsiToUtf8', 'Utf8ToAnsi');
+function string.match(s, pattern)
+  return match(s, u8:decode(pattern));
+end
+
+function string.equals(s, s2)
+  return s == u8:decode(s2);
+end
