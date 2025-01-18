@@ -91,7 +91,7 @@ end
 function hook.onServerMessage(color, text)
   if isSRP() then
     if state.config.autoCook then
-      if color == -10270721 and text == ' У вас нет нужных ингредиентов' then
+      if color == -10270721 and (text == ' У вас нет нужных ингредиентов' or text == ' Нет места') then
         autoCookItemId = nil;
       end
     end
