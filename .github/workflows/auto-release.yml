@@ -21,14 +21,13 @@ jobs:
         unzip ./samp-lua.zip
         mv ./samp ./moonloader/lib/samp
         mv ./kitchen-helper.lua ./moonloader/
+        zip -r kitchen-helper.zip ./moonloader
 
     - name: Update latest release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_TOKEN }}
         tag: latest
-        file: ./moonloader/**
-        file_glob: true
-        asset_name: kitchen-helper.zip
+        file: ./kitchen-helper.zip
         overwrite: true
         body: ""
