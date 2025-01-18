@@ -18,7 +18,7 @@ jobs:
       run: |
         mkdir -p ./moonloader/lib
         curl -L "https://github.com/THE-FYP/SAMP.Lua/releases/download/v2.3.0/samp-lua-v2.3.0.zip" -o samp-lua.zip
-        unzip ./samp-lua.zip .
+        unzip ./samp-lua.zip
         mv ./samp ./moonloader/lib/samp
         mv ./kitchen-helper.lua ./moonloader/
 
