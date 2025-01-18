@@ -17,14 +17,15 @@ jobs:
     - name: Create release artifact
       run: |
         mkdir ./moonloader
-        curl -L "https://github.com/THE-FYP/SAMP.Lua/releases/download/v2.3.0/samp-lua-v2.3.0.zip" | tar -xz
+        curl -L "https://github.com/THE-FYP/SAMP.Lua/releases/download/v2.3.0/samp-lua-v2.3.0.zip" -o samp-lua.zip
+        unzip ./samp-lua.zip
         mv ./samp ./moonloader/lib/samp
         mv ./kitchen-helper.lua ./moonloader/
 
     - name: Update latest release
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_TOKEN }}
         tag: latest
         files: |
-          **/moonloader
+          moonloader/**
