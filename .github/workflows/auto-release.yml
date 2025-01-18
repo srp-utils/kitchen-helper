@@ -27,6 +27,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GH_TOKEN }}
         tag: latest
-        file: ./moonloader/**
+        file: moonloader/**
+        asset_name: kitchen-helper.zip
         overwrite: true
         body: ""
