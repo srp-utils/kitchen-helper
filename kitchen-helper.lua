@@ -104,6 +104,8 @@ function hook.onServerMessage(color, text)
       state.stats.cookCount = state.stats.cookCount + 1;
 
       saveConfig(state);
+
+      sampSendChat('/kitchen cooking');
     end
 
     if color == 1790050303 and text:find('Вы арендовали кухню на') then
