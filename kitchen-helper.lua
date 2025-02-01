@@ -72,7 +72,7 @@ function hook.onShowDialog(id, style, title, button, button2, text)
       dishesDialogId = id;
 
       if autoCookItemId then
-        sampSendDialogResponse(id, 1);
+        sampSendDialogResponse(id, 1, autoCookItemId);
 
         return false;
       end
