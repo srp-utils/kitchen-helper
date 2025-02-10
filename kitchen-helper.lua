@@ -73,20 +73,22 @@ function hook.onShowDialog(id, style, title, button, button2, text)
       return false;
     end
 
-    if state.config.autoCook and style == DIALOG_STYLE_TABLIST_HEADERS and text:find('Блюдо') and button:equals('Ок') then
-      dishesDialogId = id;
+    if state.config.autoCook then
+      if style == DIALOG_STYLE_TABLIST_HEADERS and text:find('Блюдо') and button:equals('Ок') then
+        dishesDialogId = id;
 
-      if autoCookItemId then
-        sampSendDialogResponse(id, 1, autoCookItemId);
+        if autoCookItemId then
+          sampSendDialogResponse(id, 1, autoCookItemId);
+
+          return false;
+        end
+      end
+
+      if style == DIALOG_STYLE_MSGBOX and button:equals('Начать') then
+        sampSendDialogResponse(id, 1);
 
         return false;
       end
-    end
-
-    if style == DIALOG_STYLE_MSGBOX and button:equals('Начать') then
-      sampSendDialogResponse(id, 1);
-
-      return false;
     end
   end
 end
