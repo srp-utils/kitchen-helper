@@ -107,7 +107,7 @@ function hook.onServerMessage(color, text)
       end
     end
 
-    if color == 1790050303 and text:match('Вы приготовили.*: %d+/%d+') then
+    if color == 1790050303 and text:match('Вы приготовили.*: %d+.*') then
       state.stats.cookCount = state.stats.cookCount + 1;
       saveConfig(state);
 
